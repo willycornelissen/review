@@ -25,9 +25,10 @@ Saberemos que tivemos sucesso quando as resenhas geradas servirem concretamente 
 
 ## Scope
 **MVP**
-- Interface web simples e ágil com campo de busca para identificação rápida do livro em tempo real.
-- Integração híbrida de dados: consulta APIs públicas de livros (ex.: Google Books API / Open Library) para obter metadados factuais imediatos (título exato, autor, ano, capa, sinopse oficial).
-- Agente de IA especialista em crítica literária que concilia os metadados oficiais com o raciocínio analítico da LLM para gerar a resenha estruturada da obra.
+- Interface web Single Page Application (SPA) responsiva e estática, compatível com deploy no **GitHub Pages**.
+- Integração híbrida de dados: consulta APIs públicas de livros (ex.: Google Books API / Open Library) diretamente do cliente para obter metadados factuais imediatos (título exato, autor, ano, capa, sinopse oficial).
+- Agente de IA especialista em crítica literária rodando no cliente via SDK oficial de IA com streaming em tempo real, ancorando-se nos metadados da obra.
+- Persistência em banco de dados **Firebase (Firestore)** para armazenar o histórico de resenhas geradas, metadados do livro e data de criação para consulta posterior.
 - Resenha estruturada em dimensões fundamentais:
   - Visão Geral & Premissa (ancorada nos metadados da API, sem spoilers desnecessários);
   - Análise Temática & Subtexto;
@@ -35,11 +36,13 @@ Saberemos que tivemos sucesso quando as resenhas geradas servirem concretamente 
   - Pontos Fortes e Limitações da Obra;
   - Veredito Crítico e Referências Cruzadas.
 - Recurso para copiar a resenha formatada com 1 clique para a área de transferência.
+- Histórico visual com lista de resenhas já salvas no Firebase para fácil releitura.
 
 **Out of scope**
 - Rede social com feeds públicos, curtidas, seguidores ou comentários — *evitar complexidade no primeiro ciclo*.
 - Upload e leitura de arquivos completos (PDF/EPUB) — *foco é na análise sintética e conhecimento do agente*.
 - Sistema de cobrança, créditos ou faturamento complexo — *uso pessoal e validação inicial*.
+- Servidor de backend tradicional em Node/Python — *substituído por arquitetura serverless estática no GitHub Pages + Firebase*.
 - Geração de resenhas multimídia (áudio, podcast, vídeo ou imagem) — *fora do escopo textual inicial*.
 
 ## Delivery Milestones
@@ -50,7 +53,8 @@ Saberemos que tivemos sucesso quando as resenhas geradas servirem concretamente 
 |---|---|---|---|---|
 | 1 | Identificação Ágil via API Pública | Usuário busca um título/autor, visualiza sugestões com capa e metadados e seleciona a obra | in-progress | [.claude/plans/book-review-agent.plan.md](file:///home/willycornelissen/Desktop/Dablio/review/.claude/plans/book-review-agent.plan.md) |
 | 2 | Resenha Híbrida via Agente de IA | Agente sintetiza os metadados da API com o conhecimento da LLM e gera a resenha estruturada | in-progress | [.claude/plans/book-review-agent.plan.md](file:///home/willycornelissen/Desktop/Dablio/review/.claude/plans/book-review-agent.plan.md) |
-| 3 | Leitura Fluida e Exportação Rápida | Usuário visualiza a resenha em layout limpo e pode copiar ou salvar para consulta | pending | — |
+| 3 | Persistência Firebase & Histórico | Resenhas geradas são persistidas no Firestore e listadas para consulta rápida | pending | [.claude/plans/book-review-agent.plan.md](file:///home/willycornelissen/Desktop/Dablio/review/.claude/plans/book-review-agent.plan.md) |
+| 4 | Deploy Estático no GitHub Pages | Aplicação empacotada e publicada via workflow de GitHub Pages | pending | [.claude/plans/book-review-agent.plan.md](file:///home/willycornelissen/Desktop/Dablio/review/.claude/plans/book-review-agent.plan.md) |
 
 ## Open Questions
 - [x] **Abordagem de catálogo**: Resolvido — Arquitetura híbrida conciliando dados factuais de APIs públicas de livros (Google Books / Open Library) com a análise crítica e contextual da LLM.

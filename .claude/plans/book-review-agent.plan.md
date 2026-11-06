@@ -1,99 +1,106 @@
-# Plan: Book Review Agent (AaaS)
+# Plan: Book Review Agent (AaaS) - GitHub Pages + Firebase
 
 **Source PRD**: [.claude/prds/book-review-agent.prd.md](file:///home/willycornelissen/Desktop/Dablio/review/.claude/prds/book-review-agent.prd.md)
-**Selected Milestone**: Milestone 1 & 2 (Identificação Ágil via API Pública & Resenha Crítica Híbrida via Agente)
+**Selected Milestone**: Milestone 1, 2, 3 & 4 (Identificação de Livros, Agente de Resenha com Streaming, Persistência Firebase e Deploy GitHub Pages)
 **Complexity**: Medium
 
 ## Summary
-Construir uma aplicação web completa (Frontend React + TypeScript + Vite e Backend Node.js/Express) que permite identificar rapidamente qualquer livro através de APIs públicas (Google Books / Open Library) e acionar um Agente de IA especialista em crítica literária para produzir uma resenha aprofundada e estruturada em streaming, servindo como referência analítica de escrita.
+Construir uma aplicação web Single Page Application (SPA) em **React + TypeScript + Vite + Tailwind CSS**, concebida especificamente para hospedagem estática no **GitHub Pages** e persistência de dados no **Firebase (Firestore)**. A aplicação consome a API pública do Google Books para busca e identificação rápida de livros, aciona um Agente de IA especialista em crítica literária para gerar resenhas estruturadas em streaming direto no navegador e salva automaticamente o histórico de resenhas no Firestore.
 
 ## Patterns to Mirror
 | Category | Source | Pattern |
 |---|---|---|
-| Naming | `.agents/rules/common-coding-style.md` | CamelCase para componentes, kebab-case para arquivos, nomes de métodos imperativos e descritivos |
-| Errors | `.agents/rules/common-patterns.md` | Respostas de erro tipadas com códigos HTTP adequados, feedback visual imediato na UI |
-| Tests | `.agents/rules/common-testing.md` | TDD para serviços de API e lógica do agente (mocks de rede sem bater em APIs externas em testes de unidade) |
+| Naming | `.agents/rules/common-coding-style.md` | PascalCase para componentes React, camelCase para hooks e serviços, nomes semânticos e declarativos |
+| Architecture | GitHub Pages + Firebase SPA | Arquitetura 100% cliente sem servidor próprio dedicado; APIs externas acessadas via CORS com chave protegida no cliente (ou fallback gracioso) |
+| Persistence | Firebase Firestore + Offline Fallback | Gravação e leitura no Firestore (`reviews` collection) com fallback automático para `localStorage` caso as credenciais do Firebase ainda não tenham sido configuradas |
+| Tests | `.agents/rules/common-testing.md` | Testes unitários com Vitest para o mapeamento de livros, o agente de resenha e os serviços de dados com mocks |
 
 ## Files to Change
 | File | Action | Why |
 |---|---|---|
-| `package.json` | CREATE | Configuração de scripts, dependências de frontend (React, Tailwind, Lucide, React-Markdown) e backend (Express, SDK de IA) |
-| `tsconfig.json` & `vite.config.ts` | CREATE | Compilação TypeScript e proxy de API para desenvolvimento |
-| `tailwind.config.js` & `src/index.css` | CREATE | Estilização minimalista, moderna e responsiva |
-| `server/index.ts` | CREATE | Servidor backend Express com endpoints de busca de livros e geração de resenhas |
-| `server/services/booksService.ts` | CREATE | Integração com Google Books API pública para busca e extração de metadados |
-| `server/services/reviewAgent.ts` | CREATE | Agente de IA para crítica literária estruturada com suporte a streaming |
-| `server/tests/booksService.test.ts` | CREATE | Testes unitários do serviço de livros com mocks |
-| `server/tests/reviewAgent.test.ts` | CREATE | Testes do agente de resenha e montagem de contexto |
-| `src/types/index.ts` | CREATE | Interfaces compartilhadas para `Book`, `ReviewSection` e `ReviewPayload` |
-| `src/services/api.ts` | CREATE | Cliente HTTP de comunicação com o backend e consumo de streaming |
-| `src/components/BookSearch.tsx` | CREATE | Campo de busca reativo com debouncing e dropdown visual de seleção |
-| `src/components/BookCard.tsx` | CREATE | Exibição em destaque do livro selecionado com capa e sinopse |
-| `src/components/ReviewViewer.tsx` | CREATE | Visualizador elegante da resenha com streaming, seções analíticas e botão de copiar |
-| `src/App.tsx` | CREATE | Orquestrador de estado da aplicação web |
+| `package.json` | CREATE | Dependências SPA: `react`, `react-dom`, `firebase`, `@google/genai`, `lucide-react`, `clsx`, `tailwind-merge`, `vite`, `typescript`, `vitest` |
+| `vite.config.ts` | CREATE | Configuração do Vite com base path relativa `./` para funcionamento perfeito no GitHub Pages |
+| `tsconfig.json` & `tsconfig.node.json` | CREATE | Tipagem estrita TypeScript |
+| `tailwind.config.js` & `postcss.config.js` | CREATE | Sistema de design moderno e responsivo |
+| `src/index.css` & `src/main.tsx` | CREATE | Ponto de entrada da aplicação e estilos globais |
+| `src/types/index.ts` | CREATE | Interfaces TypeScript: `Book`, `Review`, `ReviewSection`, `FirebaseConfig` |
+| `src/services/googleBooks.ts` | CREATE | Integração direta com Google Books API para busca em tempo real com normalização de capas e autores |
+| `src/services/firebase.ts` | CREATE | Inicialização do Firebase e operações do Firestore (`saveReview`, `getReviews`, `deleteReview`) com fallback para localStorage |
+| `src/services/reviewAgent.ts` | CREATE | Agente de IA para crítica literária com prompt analítico fundamentado nos metadados e streaming em tempo real |
+| `src/components/Navbar.tsx` | CREATE | Barra de navegação com alternância de abas ("Nova Resenha" vs "Histórico Salvo") e modal de configurações de API |
+| `src/components/BookSearch.tsx` | CREATE | Campo de busca ágil com debounce, preview de resultados e seleção interativa |
+| `src/components/BookCard.tsx` | CREATE | Card de destaque do livro selecionado com imagem de capa, sinopse e badges de categoria |
+| `src/components/ReviewViewer.tsx` | CREATE | Visualizador rico da resenha com streaming dinâmico, seções críticas e botão de 1-clique para cópia |
+| `src/components/HistoryList.tsx` | CREATE | Lista de resenhas salvas no Firebase/Firestore com busca e leitura rápida |
+| `src/components/SettingsModal.tsx` | CREATE | Modal para configuração das credenciais do Firebase e da chave de IA (salvas em localStorage para uso estático no GitHub Pages) |
+| `src/App.tsx` | CREATE | Orquestração central de estado (livro selecionado, resenha ativa, visualização) |
+| `src/tests/googleBooks.test.ts` | CREATE | Testes unitários do serviço de livros |
+| `src/tests/reviewAgent.test.ts` | CREATE | Testes unitários do agente e montagem do prompt estruturado |
+| `.github/workflows/deploy.yml` | CREATE | GitHub Actions workflow para build e deploy automático no GitHub Pages |
 
 ## Tasks
 
-### Task 1: Scaffolding do Projeto & Configuração de Tipos e Ferramental
-- **Action**: Inicializar `package.json`, configurar Vite, React, TypeScript, Tailwind CSS, Vitest e dependências de servidor (Express, dotenv, SDKs de IA).
-- **Mirror**: Padrões modernos TypeScript com módulos ESM e scripts claros (`dev`, `build`, `test`).
-- **Validate**: `npm run build` e `npm test` executam sem erros.
+### Task 1: Scaffolding SPA & Configuração para GitHub Pages
+- **Action**: Inicializar `package.json`, Vite (com `base: './'`), TypeScript, Tailwind CSS, Vitest e dependências (`firebase`, `@google/genai`, `lucide-react`).
+- **Mirror**: Padrão de build estático do Vite para GitHub Pages.
+- **Validate**: `npm run build` gera a pasta `dist/` com arquivos estáticos válidos.
 
-### Task 2: Serviço de Busca de Livros (TDD)
-- **Action**: Implementar `server/services/booksService.ts` consumindo a Google Books API pública (sem necessidade de autenticação obrigatória para buscas básicas) com mapeamento normalizado para `Book { id, title, authors, publishedYear, thumbnail, description, categories }`.
-- **Mirror**: Tratamento resiliente de dados ausentes (capas faltantes, datas truncadas).
-- **Validate**: `npm test -- server/tests/booksService.test.ts` passando com 100% de sucesso.
+### Task 2: Tipos e Serviço de Busca de Livros (TDD)
+- **Action**: Criar `src/types/index.ts` e `src/services/googleBooks.ts`. Consome a API pública `https://www.googleapis.com/books/v1/volumes?q=...` sem necessidade de proxy de backend, com tratamento de capas e campos nulos.
+- **Validate**: `npm test -- src/tests/googleBooks.test.ts` passando com 100% de sucesso.
 
-### Task 3: Agente de IA Especialista em Crítica Literária (TDD)
-- **Action**: Implementar `server/services/reviewAgent.ts`. O agente recebe o livro ancorado pelos metadados da API e aplica uma persona crítica rigorosa dividida em 5 seções analíticas:
+### Task 3: Serviço do Firebase (Firestore) com Fallback Local (TDD)
+- **Action**: Criar `src/services/firebase.ts`. Conecta ao Firestore caso as credenciais estejam presentes no `.env` ou `localStorage`. Caso contrário, armazena no `localStorage` sem quebrar a aplicação, exibindo status amigável de conexão.
+- **Validate**: Testes simulando operações de salvar, listar e recuperar resenhas.
+
+### Task 4: Agente de IA para Crítica Literária com Streaming
+- **Action**: Implementar `src/services/reviewAgent.ts`. Utiliza a API do Gemini com a chave configurada no ambiente/settings para gerar a resenha crítica estruturada em 5 dimensões com streaming direto no navegador:
   1. *Premissa & Visão Geral*;
   2. *Análise Temática & Subtexto*;
   3. *Estilo Narrativo & Ritmo*;
   4. *Pontos Fortes & Limitações Críticas*;
   5. *Veredito Crítico & Recomendações*.
-  Suporta resposta em streaming via Server-Sent Events (SSE).
-- **Mirror**: Ancoragem em metadados factuais para blindagem contra alucinações.
-- **Validate**: `npm test -- server/tests/reviewAgent.test.ts` passando com sucesso.
+- **Validate**: `npm test -- src/tests/reviewAgent.test.ts` passando com sucesso.
 
-### Task 4: Endpoints de Backend & Integração
-- **Action**: Configurar `server/index.ts` com rotas `GET /api/books/search?q=:query` e `POST /api/reviews/generate` (com streaming SSE), além de middleware de CORS e tratamento de erros.
-- **Mirror**: APIs RESTful previsíveis com fallback gracioso se as APIs de IA/livros apresentarem lentidão.
-- **Validate**: `curl` local validando a busca de um livro e a resposta do endpoint.
+### Task 5: Componentes de UI (Busca, Card do Livro e Visualizador)
+- **Action**: Desenvolver `Navbar.tsx`, `BookSearch.tsx`, `BookCard.tsx`, `ReviewViewer.tsx` e `SettingsModal.tsx` com design moderno, microinterações e acessibilidade.
+- **Validate**: Fluxo completo: digitar livro -> selecionar -> acionar agente -> ler resenha em streaming -> copiar texto.
 
-### Task 5: Componentes de Busca e Seleção de Livros
-- **Action**: Implementar `BookSearch.tsx` com input reativo, debouncing de 300ms, indicador de carregamento e seleção interativa com miniaturas de capa; e `BookCard.tsx` para apresentar o livro focado.
-- **Mirror**: Acessibilidade, estados de foco e layout responsivo.
-- **Validate**: Busca interativa funcionando e livro selecionado atualizando o estado do app.
+### Task 6: Histórico de Resenhas Salvas no Firebase
+- **Action**: Implementar `HistoryList.tsx` para listar todas as resenhas salvas no Firestore, permitindo ao usuário reabrir qualquer resenha anterior instantaneamente.
+- **Validate**: Resenha gerada salva no Firestore/Local e acessível na aba de histórico.
 
-### Task 6: Visualizador de Resenha com Streaming e Ação de Cópia
-- **Action**: Implementar `ReviewViewer.tsx` capaz de receber o streaming do agente em tempo real, renderizar markdown formatado com tipografia agradável e fornecer botão de 1-clique para copiar a resenha formatada.
-- **Mirror**: Feedback visual contínuo durante a geração do texto.
-- **Validate**: Resenha gerada e exibida com botão de cópia funcionando perfeitamente.
+### Task 7: Configuração de Deploy para GitHub Pages
+- **Action**: Criar `.github/workflows/deploy.yml` com ação oficial de deploy para GitHub Pages, além de script auxiliar `npm run deploy` via `gh-pages`.
+- **Validate**: `npm run build` produz bundle estático limpo e testado.
 
 ## Validation
 ```bash
-# Validação de tipos e build
+# Checagem de tipagem estrita
 npm run typecheck
-npm run build
 
-# Validação da suíte de testes unitários
+# Execução da suíte de testes unitários
 npm test
 
-# Validação do servidor e interface em execução
+# Build de produção estática para GitHub Pages
+npm run build
+
+# Execução local em modo dev
 npm run dev
 ```
 
 ## Risks
 | Risk | Likelihood | Mitigation |
 |---|---|---|
-| Rate limit ou instabilidade na API pública de livros | Baixa | Cache em memória de buscas recentes e sanitização de query |
-| Ausência de chave de IA em novos ambientes | Média | Suporte híbrido automático tanto a GEMINI_API_KEY quanto a OPENAI_API_KEY existentes no ambiente, com mensagem explicativa amigável caso nenhuma esteja setada |
-| Livros sem capa na API pública | Média | Placeholder visual elegante com título e autor |
+| Repositório no GitHub Pages sem credenciais do Firebase configuradas de imediato | Média | Sistema híbrido: se não houver credenciais do Firebase informadas, a app salva no `localStorage` do navegador e permite adicionar a configuração a qualquer momento via modal na UI |
+| Chave da API de IA exposta no código cliente | Alta | Nenhuma chave será commitada no repositório. As chaves são lidas de `VITE_*` no build ou inseridas pelo usuário na tela de configurações e armazenadas no `localStorage` local dele |
+| Roteamento no GitHub Pages | Baixa | Uso de navegação por abas em SPA ou HashRouter para evitar erros 404 em sub-rotas no GitHub Pages |
 
 ## Acceptance
-- [ ] Interface web abre localmente de forma responsiva e limpa.
-- [ ] Busca de livros retorna resultados em tempo real com capa e metadados.
-- [ ] Ao clicar em um livro, o Agente de IA gera a resenha estruturada em streaming.
-- [ ] A resenha é apresentada nas 5 seções analíticas solicitadas.
-- [ ] O usuário consegue copiar a resenha com um clique para usar em seus próprios artigos.
+- [ ] A aplicação compila para arquivos estáticos (`dist/`) compatíveis com o GitHub Pages.
+- [ ] A busca de livros funciona diretamente no navegador via Google Books API.
+- [ ] O Agente de IA gera a resenha estruturada em streaming direto no frontend.
+- [ ] As resenhas geradas são persistidas no Firebase (Firestore) com fallback gracioso.
+- [ ] Aba de histórico permite rever resenhas salvas anteriormente.
+- [ ] Modal de configurações permite inserir/atualizar as credenciais do Firebase e a chave de IA.
 - [ ] Todos os testes unitários passam.
