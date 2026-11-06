@@ -1,7 +1,7 @@
 import { Book, ReviewSection } from '../types'
 
 const GEMINI_API_KEY_STORAGE = 'gemini_api_key'
-const DEFAULT_MODEL = 'gemini-2.5-flash' // ou gemini-1.5-flash
+const DEFAULT_MODEL = 'gemini-1.5-flash'
 
 export function getStoredApiKey(): string {
   try {
@@ -17,7 +17,12 @@ export function getStoredApiKey(): string {
 }
 
 export function saveStoredApiKey(key: string): void {
-  localStorage.setItem(GEMINI_API_KEY_STORAGE, key.trim())
+  const trimmed = key.trim()
+  if (trimmed) {
+    localStorage.setItem(GEMINI_API_KEY_STORAGE, trimmed)
+  } else {
+    localStorage.removeItem(GEMINI_API_KEY_STORAGE)
+  }
 }
 
 export function buildReviewPrompt(book: Book, tone: string = 'analitico'): string {

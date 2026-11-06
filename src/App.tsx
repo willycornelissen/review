@@ -110,7 +110,7 @@ export const App: React.FC = () => {
             fullText: full,
             sections: parsed,
             createdAt: new Date().toISOString(),
-            modelUsed: 'Gemini 2.5 Flash',
+            modelUsed: 'Gemini 1.5 Flash',
           }
 
           try {

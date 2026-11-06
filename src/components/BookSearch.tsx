@@ -15,8 +15,10 @@ export const BookSearch: React.FC<BookSearchProps> = ({ onSelectBook, disabled }
   const [isOpen, setIsOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
 
-  // Debounced search
+  // Debounced search with cancellation protection against race conditions
   useEffect(() => {
+    let isCancelled = false
+
     if (!query.trim()) {
       setResults([])
       setIsOpen(false)
@@ -26,12 +28,17 @@ export const BookSearch: React.FC<BookSearchProps> = ({ onSelectBook, disabled }
     const timer = setTimeout(async () => {
       setIsLoading(true)
       const books = await searchBooks(query)
-      setResults(books)
-      setIsLoading(false)
-      setIsOpen(books.length > 0)
+      if (!isCancelled) {
+        setResults(books)
+        setIsLoading(false)
+        setIsOpen(true)
+      }
     }, 350)
 
-    return () => clearTimeout(timer)
+    return () => {
+      isCancelled = true
+      clearTimeout(timer)
+    }
   }, [query])
 
   // Close dropdown on outside click
@@ -85,45 +92,53 @@ export const BookSearch: React.FC<BookSearchProps> = ({ onSelectBook, disabled }
       </div>
 
       {/* Results Dropdown */}
-      {isOpen && results.length > 0 && (
+      {isOpen && (
         <div className="absolute top-full left-0 right-0 mt-2 bg-slate-800 border border-slate-700/80 rounded-2xl shadow-2xl shadow-black/60 overflow-hidden z-50 max-h-96 overflow-y-auto divide-y divide-slate-700/40">
-          <div className="px-4 py-2 bg-slate-800/90 text-[11px] font-semibold text-slate-400 uppercase tracking-wider sticky top-0 backdrop-blur-md">
-            Livros Encontrados ({results.length})
-          </div>
-
-          {results.map((book) => (
-            <button
-              key={book.id}
-              onClick={() => handleSelect(book)}
-              className="w-full text-left px-4 py-3 flex items-start gap-3.5 hover:bg-slate-700/60 transition group"
-            >
-              {book.thumbnail ? (
-                <img
-                  src={book.thumbnail}
-                  alt={book.title}
-                  className="w-11 h-16 object-cover rounded-md shadow-md flex-shrink-0 group-hover:scale-105 transition-transform"
-                />
-              ) : (
-                <div className="w-11 h-16 bg-slate-700/80 rounded-md flex items-center justify-center flex-shrink-0 text-slate-400 border border-slate-600/50">
-                  <BookIcon className="w-5 h-5" />
-                </div>
-              )}
-
-              <div className="flex-1 min-w-0">
-                <h4 className="font-semibold text-sm text-slate-100 group-hover:text-brand-300 transition line-clamp-1">
-                  {book.title}
-                </h4>
-                <p className="text-xs text-slate-400 mt-0.5 line-clamp-1">
-                  {book.authors.join(', ')} • {book.publishedYear}
-                </p>
-                {book.description && (
-                  <p className="text-[11px] text-slate-400/80 mt-1 line-clamp-2 leading-relaxed">
-                    {book.description}
-                  </p>
-                )}
+          {results.length > 0 ? (
+            <>
+              <div className="px-4 py-2 bg-slate-800/90 text-[11px] font-semibold text-slate-400 uppercase tracking-wider sticky top-0 backdrop-blur-md">
+                Livros Encontrados ({results.length})
               </div>
-            </button>
-          ))}
+
+              {results.map((book) => (
+                <button
+                  key={book.id}
+                  onClick={() => handleSelect(book)}
+                  className="w-full text-left px-4 py-3 flex items-start gap-3.5 hover:bg-slate-700/60 transition group"
+                >
+                  {book.thumbnail ? (
+                    <img
+                      src={book.thumbnail}
+                      alt={book.title}
+                      className="w-11 h-16 object-cover rounded-md shadow-md flex-shrink-0 group-hover:scale-105 transition-transform"
+                    />
+                  ) : (
+                    <div className="w-11 h-16 bg-slate-700/80 rounded-md flex items-center justify-center flex-shrink-0 text-slate-400 border border-slate-600/50">
+                      <BookIcon className="w-5 h-5" />
+                    </div>
+                  )}
+
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-semibold text-sm text-slate-100 group-hover:text-brand-300 transition line-clamp-1">
+                      {book.title}
+                    </h4>
+                    <p className="text-xs text-slate-400 mt-0.5 line-clamp-1">
+                      {book.authors.join(', ')} • {book.publishedYear}
+                    </p>
+                    {book.description && (
+                      <p className="text-[11px] text-slate-400/80 mt-1 line-clamp-2 leading-relaxed">
+                        {book.description}
+                      </p>
+                    )}
+                  </div>
+                </button>
+              ))}
+            </>
+          ) : !isLoading && query.trim() ? (
+            <div className="px-5 py-6 text-center text-xs text-slate-400">
+              Nenhum livro encontrado para "<span className="text-slate-200">{query}</span>". Tente outro título ou autor.
+            </div>
+          ) : null}
         </div>
       )}
     </div>

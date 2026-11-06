@@ -43,10 +43,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   if (!isOpen) return null
 
   const handleSave = () => {
-    // Salva API key
-    if (apiKey.trim()) {
-      saveStoredApiKey(apiKey.trim())
-    }
+    // Salva ou remove API key
+    saveStoredApiKey(apiKey)
 
     // Salva Firebase se informado
     if (jsonConfig.trim()) {

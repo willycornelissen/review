@@ -1,4 +1,4 @@
-import { initializeApp, getApps, FirebaseApp } from 'firebase/app'
+import { initializeApp, getApps, deleteApp, FirebaseApp } from 'firebase/app'
 import {
   getFirestore,
   collection,
@@ -51,8 +51,16 @@ export function saveStoredFirebaseConfig(config: FirebaseConfig): void {
   initFirebase(config)
 }
 
-export function clearStoredFirebaseConfig(): void {
+export async function clearStoredFirebaseConfig(): Promise<void> {
   localStorage.removeItem(FIREBASE_CONFIG_KEY)
+  try {
+    const existingApps = getApps()
+    if (existingApps.length > 0) {
+      await Promise.all(existingApps.map((a) => deleteApp(a)))
+    }
+  } catch (e) {
+    console.warn('Erro ao deletar instâncias do Firebase:', e)
+  }
   app = null
   db = null
 }
@@ -65,7 +73,13 @@ export function initFirebase(customConfig?: FirebaseConfig): boolean {
 
   try {
     const existingApps = getApps()
-    app = existingApps.length > 0 ? existingApps[0] : initializeApp(config)
+    if (customConfig && existingApps.length > 0) {
+      // Se uma nova configuração explícita foi fornecida, encerra apps anteriores
+      existingApps.forEach((a) => deleteApp(a).catch(() => {}))
+      app = initializeApp(config)
+    } else {
+      app = existingApps.length > 0 ? existingApps[0] : initializeApp(config)
+    }
     db = getFirestore(app)
     return true
   } catch (error) {
@@ -100,10 +114,17 @@ export async function saveReview(review: BookReview): Promise<void> {
   if (isFirebaseConfigured() && db) {
     try {
       const reviewRef = doc(db, 'reviews', review.id)
-      await setDoc(reviewRef, {
+      
+      // Sanitização: remove propriedades com valores undefined (rejeitados pelo Firestore)
+      const rawData = {
         ...review,
         updatedAt: new Date().toISOString(),
-      })
+      }
+      const cleanData = Object.fromEntries(
+        Object.entries(rawData).filter(([_, v]) => v !== undefined)
+      )
+
+      await setDoc(reviewRef, cleanData)
     } catch (error) {
       console.error('Erro ao persistir resenha no Firestore:', error)
       throw error
@@ -124,13 +145,12 @@ export async function getReviews(): Promise<BookReview[]> {
         reviews.push(docSnap.data() as BookReview)
       })
 
-      if (reviews.length > 0) {
-        // Atualiza cache local
-        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(reviews))
-        return reviews
-      }
+      // Sincroniza cache local e retorna o resultado oficial do Firestore
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(reviews))
+      return reviews
     } catch (error) {
       console.warn('Erro ao buscar do Firestore, usando fallback local:', error)
+      return getLocalReviews()
     }
   }
 
