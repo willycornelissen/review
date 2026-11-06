@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import {
   Search,
   Loader2,
@@ -35,6 +35,7 @@ export const BookSearch: React.FC<BookSearchProps> = ({ onSelectBook, disabled }
   const [isLoading, setIsLoading] = useState(false)
   const [isAiLoading, setIsAiLoading] = useState(false)
   const [hasSearched, setHasSearched] = useState(false)
+  const searchIdRef = useRef(0)
 
   // Manual Form State
   const [manualTitle, setManualTitle] = useState('')
@@ -42,7 +43,7 @@ export const BookSearch: React.FC<BookSearchProps> = ({ onSelectBook, disabled }
   const [manualYear, setManualYear] = useState('')
   const [manualNotes, setManualNotes] = useState('')
 
-  // Executa busca ativa
+  // Executa busca ativa sem travar o campo de digitação
   const executeSearch = async (term: string) => {
     const trimmed = term.trim()
     if (!trimmed) {
@@ -51,27 +52,37 @@ export const BookSearch: React.FC<BookSearchProps> = ({ onSelectBook, disabled }
       return
     }
 
+    const currentId = ++searchIdRef.current
     setIsLoading(true)
     setHasSearched(true)
+
     try {
       const books = await searchBooks(trimmed)
-      setResults(books)
+      // Só atualiza se for a requisição mais recente
+      if (currentId === searchIdRef.current) {
+        setResults(books)
+      }
     } finally {
-      setIsLoading(false)
+      if (currentId === searchIdRef.current) {
+        setIsLoading(false)
+      }
     }
   }
 
-  // Debounce suave automático (400ms)
+  // Debounce confortável (650ms) e apenas para 3+ caracteres
   useEffect(() => {
-    if (!query.trim()) {
-      setResults([])
-      setHasSearched(false)
+    const trimmed = query.trim()
+    if (trimmed.length < 3) {
+      if (trimmed.length === 0) {
+        setResults([])
+        setHasSearched(false)
+      }
       return
     }
 
     const timer = setTimeout(() => {
-      executeSearch(query)
-    }, 400)
+      executeSearch(trimmed)
+    }, 650)
 
     return () => clearTimeout(timer)
   }, [query])
@@ -169,32 +180,37 @@ export const BookSearch: React.FC<BookSearchProps> = ({ onSelectBook, disabled }
               <input
                 type="text"
                 value={query}
-                disabled={disabled || isLoading || isAiLoading}
+                disabled={disabled || isAiLoading}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Digite o título do livro ou autor (ex: Dom Casmurro, 1984, Duna)..."
                 className="w-full pl-11 pr-10 py-3.5 bg-slate-800/90 border border-slate-700/80 rounded-2xl text-slate-100 placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 transition shadow-lg shadow-black/20"
               />
 
-              {query && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setQuery('')
-                    setResults([])
-                    setHasSearched(false)
-                  }}
-                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-white"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              )}
+              <div className="absolute inset-y-0 right-0 pr-3.5 flex items-center gap-1.5">
+                {isLoading && (
+                  <Loader2 className="w-4 h-4 text-brand-400 animate-spin" />
+                )}
+                {query && !isLoading && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setQuery('')
+                      setResults([])
+                      setHasSearched(false)
+                    }}
+                    className="text-slate-400 hover:text-white p-1 rounded-lg transition"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
             </div>
 
             <button
               type="button"
               onClick={() => executeSearch(query)}
-              disabled={disabled || isLoading || !query.trim()}
+              disabled={disabled || !query.trim()}
               className="px-5 py-3.5 bg-brand-600 hover:bg-brand-500 disabled:opacity-50 text-white font-semibold text-xs rounded-2xl transition flex items-center gap-2 shadow-lg shadow-brand-500/20"
             >
               {isLoading ? (
