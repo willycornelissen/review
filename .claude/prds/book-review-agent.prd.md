@@ -51,10 +51,10 @@ Saberemos que tivemos sucesso quando as resenhas geradas servirem concretamente 
 
 | # | Milestone | Outcome | Status | Plan |
 |---|---|---|---|---|
-| 1 | Identificação Ágil via API Pública | Usuário busca um título/autor, visualiza sugestões com capa e metadados e seleciona a obra | in-progress | [.claude/plans/book-review-agent.plan.md](file:///home/willycornelissen/Desktop/Dablio/review/.claude/plans/book-review-agent.plan.md) |
-| 2 | Resenha Híbrida via Agente de IA | Agente sintetiza os metadados da API com o conhecimento da LLM e gera a resenha estruturada | in-progress | [.claude/plans/book-review-agent.plan.md](file:///home/willycornelissen/Desktop/Dablio/review/.claude/plans/book-review-agent.plan.md) |
-| 3 | Persistência Firebase & Histórico | Resenhas geradas são persistidas no Firestore e listadas para consulta rápida | pending | [.claude/plans/book-review-agent.plan.md](file:///home/willycornelissen/Desktop/Dablio/review/.claude/plans/book-review-agent.plan.md) |
-| 4 | Deploy Estático no GitHub Pages | Aplicação empacotada e publicada via workflow de GitHub Pages | pending | [.claude/plans/book-review-agent.plan.md](file:///home/willycornelissen/Desktop/Dablio/review/.claude/plans/book-review-agent.plan.md) |
+| 1 | Identificação Ágil via API Pública | Usuário busca um título/autor, visualiza sugestões com capa e metadados e seleciona a obra | complete | [.claude/plans/book-review-agent.plan.md](file:///home/willycornelissen/Desktop/Dablio/review/.claude/plans/book-review-agent.plan.md) |
+| 2 | Resenha Híbrida via Agente de IA | Agente sintetiza os metadados da API com o conhecimento da LLM e gera a resenha estruturada | complete | [.claude/plans/book-review-agent.plan.md](file:///home/willycornelissen/Desktop/Dablio/review/.claude/plans/book-review-agent.plan.md) |
+| 3 | Persistência Firebase & Histórico | Resenhas geradas são persistidas no Firestore e listadas para consulta rápida | complete | [.claude/plans/book-review-agent.plan.md](file:///home/willycornelissen/Desktop/Dablio/review/.claude/plans/book-review-agent.plan.md) |
+| 4 | Deploy Estático no GitHub Pages | Aplicação empacotada e publicada via workflow de GitHub Pages | complete | [.claude/plans/book-review-agent.plan.md](file:///home/willycornelissen/Desktop/Dablio/review/.claude/plans/book-review-agent.plan.md) |
 
 ## Open Questions
 - [x] **Abordagem de catálogo**: Resolvido — Arquitetura híbrida conciliando dados factuais de APIs públicas de livros (Google Books / Open Library) com a análise crítica e contextual da LLM.
