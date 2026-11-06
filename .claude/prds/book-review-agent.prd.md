@@ -48,8 +48,8 @@ Saberemos que tivemos sucesso quando as resenhas geradas servirem concretamente 
 
 | # | Milestone | Outcome | Status | Plan |
 |---|---|---|---|---|
-| 1 | Identificação Ágil via API Pública | Usuário busca um título/autor, visualiza sugestões com capa e metadados e seleciona a obra | pending | — |
-| 2 | Resenha Híbrida via Agente de IA | Agente sintetiza os metadados da API com o conhecimento da LLM e gera a resenha estruturada | pending | — |
+| 1 | Identificação Ágil via API Pública | Usuário busca um título/autor, visualiza sugestões com capa e metadados e seleciona a obra | in-progress | [.claude/plans/book-review-agent.plan.md](file:///home/willycornelissen/Desktop/Dablio/review/.claude/plans/book-review-agent.plan.md) |
+| 2 | Resenha Híbrida via Agente de IA | Agente sintetiza os metadados da API com o conhecimento da LLM e gera a resenha estruturada | in-progress | [.claude/plans/book-review-agent.plan.md](file:///home/willycornelissen/Desktop/Dablio/review/.claude/plans/book-review-agent.plan.md) |
 | 3 | Leitura Fluida e Exportação Rápida | Usuário visualiza a resenha em layout limpo e pode copiar ou salvar para consulta | pending | — |
 
 ## Open Questions
