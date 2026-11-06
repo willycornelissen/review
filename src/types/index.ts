@@ -16,30 +16,7 @@ export interface ReviewSection {
   content: string
 }
 
-export interface BookReview {
-  id: string
-  bookId: string
-  bookTitle: string
-  bookAuthors: string[]
-  bookCover?: string
-  publishedYear?: string
-  fullText: string
-  sections: ReviewSection[]
-  createdAt: string
-  modelUsed?: string
-}
-
-export interface FirebaseConfig {
-  apiKey: string
-  authDomain: string
-  projectId: string
-  storageBucket: string
-  messagingSenderId: string
-  appId: string
-}
-
 export interface AppSettings {
   geminiApiKey: string
-  firebaseConfig?: FirebaseConfig
   reviewTone: 'critico' | 'analitico' | 'academico' | 'casual'
 }

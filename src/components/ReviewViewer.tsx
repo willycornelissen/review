@@ -9,7 +9,6 @@ interface ReviewViewerProps {
   bookTitle: string
   bookAuthor: string
   modelUsed?: string
-  savedAt?: string
 }
 
 export const ReviewViewer: React.FC<ReviewViewerProps> = ({
@@ -19,7 +18,6 @@ export const ReviewViewer: React.FC<ReviewViewerProps> = ({
   bookTitle,
   bookAuthor,
   modelUsed = 'Gemini 3.5 Flash Lite',
-  savedAt,
 }) => {
   const [copied, setCopied] = useState(false)
 
@@ -60,7 +58,6 @@ export const ReviewViewer: React.FC<ReviewViewerProps> = ({
           </h3>
           <p className="text-xs text-slate-400 mt-0.5">
             Autor: {bookAuthor} • Modelo: {modelUsed}
-            {savedAt && ` • Salvo em: ${new Date(savedAt).toLocaleDateString('pt-BR')}`}
           </p>
         </div>
 
@@ -71,11 +68,11 @@ export const ReviewViewer: React.FC<ReviewViewerProps> = ({
             disabled={!fullText}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition border ${
               copied
-                ? 'bg-emerald-600 text-white border-emerald-500'
-                : 'bg-slate-700/80 hover:bg-slate-700 text-slate-200 hover:text-white border-slate-600/50'
+                ? 'bg-emerald-600 text-white border-emerald-500 shadow-lg shadow-emerald-500/20'
+                : 'bg-brand-600 hover:bg-brand-500 text-white border-brand-500 shadow-lg shadow-brand-500/20'
             }`}
           >
-            {copied ? <Check className="w-4 h-4 text-emerald-200" /> : <Copy className="w-4 h-4 text-slate-300" />}
+            {copied ? <Check className="w-4 h-4 text-emerald-200" /> : <Copy className="w-4 h-4" />}
             <span>{copied ? 'Copiado para o Clipboard!' : 'Copiar Resenha'}</span>
           </button>
         </div>
@@ -114,9 +111,15 @@ export const ReviewViewer: React.FC<ReviewViewerProps> = ({
       <div className="mt-6 pt-4 border-t border-slate-800 flex items-center justify-between text-xs text-slate-500">
         <span className="flex items-center gap-1.5">
           <ShieldCheck className="w-4 h-4 text-emerald-500/70" />
-          Metadados factuais verificados via Google Books API
+          Análise literária gerada e pronta para cópia
         </span>
-        <span>Pronto para enriquecer seus artigos e resenhas</span>
+        <button
+          onClick={handleCopy}
+          disabled={!fullText}
+          className="text-brand-400 hover:text-brand-300 hover:underline"
+        >
+          Copiar texto completo
+        </button>
       </div>
     </div>
   )
