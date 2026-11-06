@@ -1,7 +1,14 @@
 import { Book, ReviewSection } from '../types'
 
 const GEMINI_API_KEY_STORAGE = 'gemini_api_key'
-const DEFAULT_MODEL = 'gemini-1.5-flash'
+export const CANDIDATE_MODELS = [
+  'gemini-3.5-flash-lite',
+  'gemini-3-flash-preview',
+  'gemini-3.1-flash-lite-preview',
+  'gemini-3.8-flash',
+  'gemini-2.5-flash',
+]
+export const DEFAULT_MODEL = 'gemini-3.5-flash-lite'
 
 export function getStoredApiKey(): string {
   try {
@@ -88,7 +95,7 @@ export async function generateReviewStream(
   book: Book,
   tone: string = 'analitico',
   onChunk: (chunk: string) => void,
-  onComplete: (fullText: string) => void,
+  onComplete: (fullText: string, modelUsed: string) => void,
   onError: (error: Error) => void
 ): Promise<void> {
   const apiKey = getStoredApiKey()
@@ -102,72 +109,82 @@ export async function generateReviewStream(
   }
 
   const prompt = buildReviewPrompt(book, tone)
-  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${DEFAULT_MODEL}:streamGenerateContent?alt=sse&key=${apiKey}`
+  let lastError: Error | null = null
 
-  try {
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        contents: [
-          {
-            parts: [{ text: prompt }],
-          },
-        ],
-        generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 2500,
+  // Tenta em sequência os modelos candidatos em caso de 404 (depreciado) ou 503 (alta demanda)
+  for (const model of CANDIDATE_MODELS) {
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?alt=sse&key=${apiKey}`
+
+    try {
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-      }),
-    })
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [{ text: prompt }],
+            },
+          ],
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 2500,
+          },
+        }),
+      })
 
-    if (!response.ok) {
-      const errBody = await response.text()
-      throw new Error(`Erro na API do Gemini (HTTP ${response.status}): ${errBody}`)
-    }
+      if (!response.ok) {
+        const errBody = await response.text()
+        console.warn(`Modelo ${model} retornou HTTP ${response.status}. Tentando próximo modelo...`)
+        lastError = new Error(`Erro na API do Gemini (${model} - HTTP ${response.status}): ${errBody}`)
+        continue
+      }
 
-    if (!response.body) {
-      throw new Error('Resposta sem corpo de streaming')
-    }
+      if (!response.body) {
+        throw new Error('Resposta sem corpo de streaming')
+      }
 
-    const reader = response.body.getReader()
-    const decoder = new TextDecoder('utf-8')
-    let fullText = ''
-    let buffer = ''
+      const reader = response.body.getReader()
+      const decoder = new TextDecoder('utf-8')
+      let fullText = ''
+      let buffer = ''
 
-    while (true) {
-      const { done, value } = await reader.read()
-      if (done) break
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
 
-      buffer += decoder.decode(value, { stream: true })
-      const lines = buffer.split('\n')
-      buffer = lines.pop() || ''
+        buffer += decoder.decode(value, { stream: true })
+        const lines = buffer.split('\n')
+        buffer = lines.pop() || ''
 
-      for (const line of lines) {
-        if (line.startsWith('data: ')) {
-          const jsonStr = line.replace('data: ', '').trim()
-          if (!jsonStr || jsonStr === '[DONE]') continue
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const jsonStr = line.replace('data: ', '').trim()
+            if (!jsonStr || jsonStr === '[DONE]') continue
 
-          try {
-            const data = JSON.parse(jsonStr)
-            const textChunk =
-              data.candidates?.[0]?.content?.parts?.[0]?.text || ''
-            if (textChunk) {
-              fullText += textChunk
-              onChunk(textChunk)
+            try {
+              const data = JSON.parse(jsonStr)
+              const textChunk =
+                data.candidates?.[0]?.content?.parts?.[0]?.text || ''
+              if (textChunk) {
+                fullText += textChunk
+                onChunk(textChunk)
+              }
+            } catch (e) {
+              // Ignora fragmento JSON incompleto no buffer
             }
-          } catch (e) {
-            // Ignora fragmento JSON incompleto no buffer
           }
         }
       }
-    }
 
-    onComplete(fullText)
-  } catch (err: any) {
-    console.error('Falha ao gerar resenha via streaming:', err)
-    onError(err instanceof Error ? err : new Error(String(err)))
+      onComplete(fullText, model)
+      return
+    } catch (err: any) {
+      console.warn(`Falha na requisição para modelo ${model}:`, err)
+      lastError = err instanceof Error ? err : new Error(String(err))
+    }
   }
+
+  onError(lastError || new Error('Nenhum modelo Gemini respondeu com sucesso.'))
 }

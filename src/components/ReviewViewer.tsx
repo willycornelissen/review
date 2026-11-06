@@ -18,7 +18,7 @@ export const ReviewViewer: React.FC<ReviewViewerProps> = ({
   isStreaming,
   bookTitle,
   bookAuthor,
-  modelUsed = 'Gemini 1.5 Flash',
+  modelUsed = 'Gemini 3.5 Flash Lite',
   savedAt,
 }) => {
   const [copied, setCopied] = useState(false)

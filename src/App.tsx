@@ -94,7 +94,7 @@ export const App: React.FC = () => {
         (chunk) => {
           setStreamingText((prev) => prev + chunk)
         },
-        async (full) => {
+        async (full, modelUsed) => {
           setIsStreaming(false)
           const parsed = parseReviewSections(full)
           setSections(parsed)
@@ -110,7 +110,7 @@ export const App: React.FC = () => {
             fullText: full,
             sections: parsed,
             createdAt: new Date().toISOString(),
-            modelUsed: 'Gemini 1.5 Flash',
+            modelUsed: modelUsed || 'Gemini 3.5 Flash Lite',
           }
 
           try {
