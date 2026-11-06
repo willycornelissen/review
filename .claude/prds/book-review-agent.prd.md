@@ -25,10 +25,11 @@ Saberemos que tivemos sucesso quando as resenhas geradas servirem concretamente 
 
 ## Scope
 **MVP**
-- Interface web simples e ágil com campo de busca para identificação rápida do livro (título, autor e metadados visuais).
-- Agente de IA especialista em crítica literária acionado sob demanda para gerar a resenha analítica da obra selecionada.
+- Interface web simples e ágil com campo de busca para identificação rápida do livro em tempo real.
+- Integração híbrida de dados: consulta APIs públicas de livros (ex.: Google Books API / Open Library) para obter metadados factuais imediatos (título exato, autor, ano, capa, sinopse oficial).
+- Agente de IA especialista em crítica literária que concilia os metadados oficiais com o raciocínio analítico da LLM para gerar a resenha estruturada da obra.
 - Resenha estruturada em dimensões fundamentais:
-  - Visão Geral & Premissa (sem spoilers desnecessários);
+  - Visão Geral & Premissa (ancorada nos metadados da API, sem spoilers desnecessários);
   - Análise Temática & Subtexto;
   - Estilo de Escrita & Ritmo Narrativo;
   - Pontos Fortes e Limitações da Obra;
@@ -47,17 +48,17 @@ Saberemos que tivemos sucesso quando as resenhas geradas servirem concretamente 
 
 | # | Milestone | Outcome | Status | Plan |
 |---|---|---|---|---|
-| 1 | Identificação Ágil de Livros na Web | Usuário busca um título/autor e seleciona o livro com metadados confirmados | pending | — |
-| 2 | Geração da Resenha Crítica Estruturada | Usuário solicita a resenha e recebe o texto analítico gerado pelo agente | pending | — |
+| 1 | Identificação Ágil via API Pública | Usuário busca um título/autor, visualiza sugestões com capa e metadados e seleciona a obra | pending | — |
+| 2 | Resenha Híbrida via Agente de IA | Agente sintetiza os metadados da API com o conhecimento da LLM e gera a resenha estruturada | pending | — |
 | 3 | Leitura Fluida e Exportação Rápida | Usuário visualiza a resenha em layout limpo e pode copiar ou salvar para consulta | pending | — |
 
 ## Open Questions
-- [ ] Qual fonte/API de catálogo (Google Books API, Open Library ou extração do LLM) oferece a melhor combinação de latência e precisão em português?
+- [x] **Abordagem de catálogo**: Resolvido — Arquitetura híbrida conciliando dados factuais de APIs públicas de livros (Google Books / Open Library) com a análise crítica e contextual da LLM.
 
 ## Risks
 | Risk | Likelihood | Impact | Mitigation |
 |---|---|---|---|
-| Alucinação em livros raros ou muito recentes | Média | Médio | Alimentar o agente com sinopse e metadados oficiais retornados pela busca |
+| Alucinação em livros raros ou muito recentes | Baixa | Médio | Ancorar o prompt do agente com a sinopse oficial e metadados retornados pela API pública |
 | Latência elevada na geração de texto longo | Média | Alto | Exibir resposta em streaming na interface web conforme o agente escreve |
 
 ---
