@@ -1,1 +1,1 @@
-export { searchBooks, identifyBookWithAI } from './bookCatalog'
+export { searchBooks, identifyBookWithAI, searchBookByIsbn, normalizeIsbn } from './bookCatalog'

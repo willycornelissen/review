@@ -1,5 +1,5 @@
 import React from 'react'
-import { Book as BookIcon, Sparkles, RefreshCw, Calendar, Tag, FileText, ChevronRight } from 'lucide-react'
+import { Book as BookIcon, Sparkles, RefreshCw, Calendar, Tag, FileText, ChevronRight, Barcode } from 'lucide-react'
 import { Book } from '../types'
 
 interface BookCardProps {
@@ -81,6 +81,13 @@ export const BookCard: React.FC<BookCardProps> = ({
               <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-brand-500/10 text-brand-300 text-xs font-medium border border-brand-500/20">
                 <Tag className="w-3 h-3 text-brand-400" />
                 {book.categories[0]}
+              </span>
+            )}
+
+            {book.isbn && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-300 text-xs font-medium border border-indigo-500/20">
+                <Barcode className="w-3.5 h-3.5 text-indigo-400" />
+                ISBN: {book.isbn}
               </span>
             )}
           </div>

@@ -22,7 +22,7 @@ flowchart LR
 
 ### Funcionalidades Chave:
 1. **Catálogo Global Aberto**: Busca ágil em tempo real com Open Library e Google Books, sem necessidade de chaves de catálogo ou servidores intermediários.
-2. **Entrada Manual & Busca com IA**: Opção de inserir qualquer título/autor diretamente ou solicitar identificação inteligente de obras pela IA.
+2. **Pesquisa Exclusiva por ISBN & Busca com IA**: Aba dedicada para consulta direta por código ISBN (10 ou 13 dígitos) com identificação exata da edição nos acervos internacionais, além de resolução inteligente via IA.
 3. **Crítica Estruturada em 5 Dimensões**:
    - *Visão Geral & Premissa*;
    - *Análise Temática & Subtexto*;

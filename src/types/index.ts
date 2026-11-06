@@ -9,6 +9,7 @@ export interface Book {
   pageCount?: number
   publisher?: string
   language?: string
+  isbn?: string
 }
 
 export interface ReviewSection {
