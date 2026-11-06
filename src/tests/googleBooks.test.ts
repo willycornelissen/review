@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { searchBooks } from '../services/googleBooks'
 
-describe('searchBooks service', () => {
+describe('searchBooks service (Open Library + Fallback)', () => {
   beforeEach(() => {
     vi.restoreAllMocks()
   })
@@ -13,28 +13,24 @@ describe('searchBooks service', () => {
     expect(resultsSpaces).toEqual([])
   })
 
-  it('mapeia os dados da Google Books API para o tipo Book corretamente', async () => {
-    const mockApiResponse = {
-      items: [
+  it('mapeia os dados do Open Library para o tipo Book corretamente', async () => {
+    const mockOlResponse = {
+      docs: [
         {
-          id: 'test-123',
-          volumeInfo: {
-            title: 'Dom Casmurro',
-            authors: ['Machado de Assis'],
-            publishedDate: '1899',
-            description: 'Clássico da literatura brasileira sobre ciúmes e traição.',
-            imageLinks: {
-              thumbnail: 'http://books.google.com/books/content?id=123',
-            },
-            categories: ['Ficção', 'Literatura Brasileira'],
-          },
+          key: '/works/OL1003040W',
+          title: 'Dom Casmurro',
+          author_name: ['Machado de Assis'],
+          first_publish_year: 1899,
+          cover_i: 647501,
+          subject: ['Ficção', 'Literatura Brasileira'],
+          first_sentence: ['Uma noite destas, vindo da cidade para o Engenho Novo...'],
         },
       ],
     }
 
     vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
       ok: true,
-      json: async () => mockApiResponse,
+      json: async () => mockOlResponse,
     } as Response)
 
     const books = await searchBooks('Dom Casmurro')
@@ -42,12 +38,12 @@ describe('searchBooks service', () => {
     expect(books[0].title).toBe('Dom Casmurro')
     expect(books[0].authors).toEqual(['Machado de Assis'])
     expect(books[0].publishedYear).toBe('1899')
-    // Verifica que http foi convertido para https
-    expect(books[0].thumbnail).toBe('https://books.google.com/books/content?id=123')
+    expect(books[0].thumbnail).toBe('https://covers.openlibrary.org/b/id/647501-M.jpg')
+    expect(books[0].description).toContain('Uma noite destas')
   })
 
-  it('trata erros da API retornando array vazio sem lançar exceção', async () => {
-    vi.spyOn(globalThis, 'fetch').mockRejectedValueOnce(new Error('Network error'))
+  it('trata falha de rede retornando array vazio sem quebrar a aplicação', async () => {
+    vi.spyOn(globalThis, 'fetch').mockRejectedValue(new Error('Network offline'))
     const books = await searchBooks('Qualquer Livro')
     expect(books).toEqual([])
   })
