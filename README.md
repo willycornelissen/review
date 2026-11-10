@@ -88,3 +88,4 @@ Os artefatos estáticos prontos para deploy são gerados no diretório `dist/`.
 * **PRD (Product Requirements Document)**: [`.claude/prds/book-review-agent.prd.md`](file:///home/willycornelissen/Desktop/Dablio/review/.claude/prds/book-review-agent.prd.md)
 * **Plano Técnico de Implementação**: [`.claude/plans/book-review-agent.plan.md`](file:///home/willycornelissen/Desktop/Dablio/review/.claude/plans/book-review-agent.plan.md)
 * **Diretrizes Agênticas**: [`AGENTS.md`](file:///home/willycornelissen/Desktop/Dablio/review/AGENTS.md)
+* **Diretrizes de Segurança e Publicação**: [`security.md`](file:///home/willycornelissen/Desktop/Dablio/review/security.md)
