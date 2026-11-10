@@ -4,11 +4,13 @@ import { Book } from '../types'
 
 interface BookCardProps {
   book: Book
-  onGenerate: (tone: string) => void
+  onGenerate: (tone: string, isAdler?: boolean) => void
   onClear: () => void
   isGenerating: boolean
   selectedTone: string
   setSelectedTone: (tone: string) => void
+  isAdlerAnalytical: boolean
+  setIsAdlerAnalytical: (val: boolean) => void
 }
 
 export const BookCard: React.FC<BookCardProps> = ({
@@ -18,6 +20,8 @@ export const BookCard: React.FC<BookCardProps> = ({
   isGenerating,
   selectedTone,
   setSelectedTone,
+  isAdlerAnalytical,
+  setIsAdlerAnalytical,
 }) => {
   return (
     <div className="bg-slate-800/90 border border-slate-700/80 rounded-2xl p-5 sm:p-6 shadow-xl shadow-black/30 backdrop-blur-sm">
@@ -99,8 +103,8 @@ export const BookCard: React.FC<BookCardProps> = ({
             </p>
           </div>
 
-          {/* Controls: Tone & Trigger */}
-          <div className="mt-5 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-4 border-t border-slate-700/60">
+          {/* Controls: Tone, Adler Checkbox & Trigger */}
+          <div className="mt-5 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 pt-4 border-t border-slate-700/60">
             <div className="flex items-center gap-2">
               <label htmlFor="tone-select" className="text-xs text-slate-400 whitespace-nowrap">
                 Tom da Análise:
@@ -119,8 +123,24 @@ export const BookCard: React.FC<BookCardProps> = ({
               </select>
             </div>
 
+            {/* Checkbox Leitura Analítica Mortimer Adler */}
+            <label
+              htmlFor="adler-checkbox"
+              className="flex items-center gap-2 text-xs text-slate-300 hover:text-white cursor-pointer select-none py-1"
+            >
+              <input
+                id="adler-checkbox"
+                type="checkbox"
+                checked={isAdlerAnalytical}
+                onChange={(e) => setIsAdlerAnalytical(e.target.checked)}
+                disabled={isGenerating}
+                className="w-4 h-4 rounded text-brand-600 bg-slate-700 border-slate-600 focus:ring-brand-500 focus:ring-offset-slate-900 cursor-pointer accent-brand-500"
+              />
+              <span className="font-medium">Leitura Analítica Mortimer Adler</span>
+            </label>
+
             <button
-              onClick={() => onGenerate(selectedTone)}
+              onClick={() => onGenerate(selectedTone, isAdlerAnalytical)}
               disabled={isGenerating}
               className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 text-white font-semibold text-xs sm:text-sm shadow-lg shadow-brand-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
             >

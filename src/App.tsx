@@ -15,6 +15,8 @@ import { Sparkles, AlertCircle } from 'lucide-react'
 export const App: React.FC = () => {
   const [selectedBook, setSelectedBook] = useState<Book | null>(null)
   const [selectedTone, setSelectedTone] = useState<string>('analitico')
+  const [isAdlerAnalytical, setIsAdlerAnalytical] = useState<boolean>(false)
+  const [generatedWithAdler, setGeneratedWithAdler] = useState<boolean>(false)
 
   // Review Generation State
   const [streamingText, setStreamingText] = useState('')
@@ -39,7 +41,7 @@ export const App: React.FC = () => {
     setErrorMessage(null)
   }
 
-  const handleGenerate = async (tone: string) => {
+  const handleGenerate = async (tone: string, adlerMode?: boolean) => {
     if (!selectedBook) return
 
     const apiKey = getStoredApiKey()
@@ -51,10 +53,13 @@ export const App: React.FC = () => {
       return
     }
 
+    const isAdler = adlerMode ?? isAdlerAnalytical
+
     setStreamingText('')
     setSections([])
     setErrorMessage(null)
     setIsStreaming(true)
+    setGeneratedWithAdler(isAdler)
 
     try {
       await generateReviewStream(
@@ -74,7 +79,8 @@ export const App: React.FC = () => {
         (error) => {
           setIsStreaming(false)
           setErrorMessage(error.message)
-        }
+        },
+        isAdler
       )
     } catch (err: any) {
       setIsStreaming(false)
@@ -144,6 +150,8 @@ export const App: React.FC = () => {
               isGenerating={isStreaming}
               selectedTone={selectedTone}
               setSelectedTone={setSelectedTone}
+              isAdlerAnalytical={isAdlerAnalytical}
+              setIsAdlerAnalytical={setIsAdlerAnalytical}
             />
 
             {/* Review Presentation */}
@@ -155,6 +163,7 @@ export const App: React.FC = () => {
                 bookTitle={selectedBook.title}
                 bookAuthor={selectedBook.authors.join(', ')}
                 modelUsed={activeModel}
+                isAdlerMode={generatedWithAdler}
               />
             )}
           </div>

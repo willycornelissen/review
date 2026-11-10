@@ -32,9 +32,44 @@ export function saveStoredApiKey(key: string): void {
   }
 }
 
-export function buildReviewPrompt(book: Book, tone: string = 'analitico'): string {
+export function buildReviewPrompt(
+  book: Book,
+  tone: string = 'analitico',
+  isAdler: boolean = false
+): string {
   const authorsStr = book.authors.join(', ')
   const categoriesStr = book.categories && book.categories.length > 0 ? book.categories.join(', ') : 'Geral'
+
+  if (isAdler) {
+    return `Você é um Crítico Literário Especialista e leitor analítico formado na metodologia clássica de Mortimer J. Adler (da obra seminal "Como Ler Livros").
+Sua missão é produzir uma resenha analítica aprofundada, rigorosa e estruturada segundo as quatro perguntas fundamentais da leitura analítica de Mortimer Adler.
+
+INFORMAÇÕES VERIFICADAS DA OBRA (GROUNDING FACTUAL):
+- Título: ${book.title}
+- Autor(es): ${authorsStr}
+- Ano de Publicação: ${book.publishedYear}
+- Gêneros/Categorias: ${categoriesStr}
+- Sinopse Factual da API: ${book.description}
+
+DIRETRIZES DA RESENHA:
+1. Tom desejado: ${tone.toUpperCase()} (rigoroso, embasado, sem superficialidades de marketing).
+2. Aplique com fidelidade a técnica da Leitura Analítica de Adler: clareza na unidade e nas partes essenciais, identificação dos termos-chave e argumentos, julgamento crítico imparcial após a compreensão, e significado prático/intelectual da obra.
+3. Não faça resumos vazios ou genéricos. Conecte as ideias e argumentos centrais com as teses e temas do autor.
+4. Evite spoilers irrelevantes que arruínem o clímax, mas analise o arco dramático ou a linha argumentativa com propriedade crítica.
+5. Estruture sua resposta rigorosamente utilizando os títulos de seção abaixo:
+
+## 1. Sobre o que é o livro como um todo?
+Classifique a obra e identifique seu tema condutor ou tese central unificadora. Resuma em poucas frases o argumento principal ou enredo e descreva sucintamente a articulação das principais partes do livro.
+
+## 2. O que exatamente está sendo dito, e como?
+Explicite os termos-chave e conceitos fundamentais do autor. Identifique as proposições ou premissas centrais e analise os principais argumentos que o autor articula para sustentá-las.
+
+## 3. O livro é verdadeiro, no todo ou em parte?
+Faça uma crítica fundamentada e honesta da obra (aplicando os critérios de Adler: verificar se o autor está desinformado, mal informado, é ilógico ou se a análise é incompleta; ou, no caso de ficção, avaliar a verossimilhança e fidelidade à experiência humana).
+
+## 4. O que se segue disso? (E daí?)
+Avalie a significância e o impacto duradouro do livro. Por que essas ideias ou reflexões importam para o leitor? Quais são suas implicações práticas, intelectuais, morais ou culturais?`
+  }
 
   return `Você é um Crítico Literário Especialista de renome e consultor de escrita literária.
 Sua missão é produzir uma resenha crítica aprofundada, elegante e perspicaz sobre o livro informado, servindo como padrão de referência analítica para outro escritor.
@@ -96,7 +131,8 @@ export async function generateReviewStream(
   tone: string = 'analitico',
   onChunk: (chunk: string) => void,
   onComplete: (fullText: string, modelUsed: string) => void,
-  onError: (error: Error) => void
+  onError: (error: Error) => void,
+  isAdler: boolean = false
 ): Promise<void> {
   const apiKey = getStoredApiKey()
   if (!apiKey) {
@@ -108,7 +144,7 @@ export async function generateReviewStream(
     return
   }
 
-  const prompt = buildReviewPrompt(book, tone)
+  const prompt = buildReviewPrompt(book, tone, isAdler)
   let lastError: Error | null = null
 
   // Tenta em sequência os modelos candidatos em caso de 404 (depreciado) ou 503 (alta demanda)

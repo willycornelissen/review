@@ -9,6 +9,7 @@ interface ReviewViewerProps {
   bookTitle: string
   bookAuthor: string
   modelUsed?: string
+  isAdlerMode?: boolean
 }
 
 export const ReviewViewer: React.FC<ReviewViewerProps> = ({
@@ -18,6 +19,7 @@ export const ReviewViewer: React.FC<ReviewViewerProps> = ({
   bookTitle,
   bookAuthor,
   modelUsed = 'Gemini 3.5 Flash Lite',
+  isAdlerMode = false,
 }) => {
   const [copied, setCopied] = useState(false)
 
@@ -43,7 +45,7 @@ export const ReviewViewer: React.FC<ReviewViewerProps> = ({
           <div className="flex items-center gap-2">
             <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-brand-500/10 text-brand-300 text-xs font-semibold border border-brand-500/20">
               <Sparkles className="w-3.5 h-3.5 text-brand-400" />
-              Resenha Crítica Gerada
+              {isAdlerMode ? 'Leitura Analítica (Mortimer Adler)' : 'Resenha Crítica Gerada'}
             </span>
             {isStreaming && (
               <span className="flex items-center gap-1.5 text-xs text-amber-400 animate-pulse font-medium">
@@ -57,7 +59,7 @@ export const ReviewViewer: React.FC<ReviewViewerProps> = ({
             Análise Crítica: {bookTitle}
           </h3>
           <p className="text-xs text-slate-400 mt-0.5">
-            Autor: {bookAuthor} • Modelo: {modelUsed}
+            Autor: {bookAuthor} • {isAdlerMode ? '4 Perguntas de Mortimer Adler' : '5 Dimensões Críticas'} • Modelo: {modelUsed}
           </p>
         </div>
 
