@@ -1,6 +1,34 @@
 import React, { useState } from 'react'
 import { Copy, Check, Sparkles, ShieldCheck } from 'lucide-react'
+import ReactMarkdown from 'react-markdown'
 import { ReviewSection } from '../types'
+
+const markdownComponents = {
+  strong: ({ ...props }) => (
+    <strong className="font-bold text-slate-100" {...props} />
+  ),
+  em: ({ ...props }) => (
+    <em className="italic text-slate-200" {...props} />
+  ),
+  p: ({ ...props }) => (
+    <p className="mb-3.5 leading-relaxed last:mb-0" {...props} />
+  ),
+  ul: ({ ...props }) => (
+    <ul className="list-disc list-inside space-y-1.5 mb-3.5 text-slate-300" {...props} />
+  ),
+  ol: ({ ...props }) => (
+    <ol className="list-decimal list-inside space-y-1.5 mb-3.5 text-slate-300" {...props} />
+  ),
+  li: ({ ...props }) => (
+    <li className="leading-relaxed" {...props} />
+  ),
+  blockquote: ({ ...props }) => (
+    <blockquote
+      className="border-l-2 border-brand-500/70 pl-3.5 my-3 italic text-slate-400 bg-slate-900/30 py-1 rounded-r-lg"
+      {...props}
+    />
+  ),
+}
 
 interface ReviewViewerProps {
   fullText: string
@@ -94,14 +122,18 @@ export const ReviewViewer: React.FC<ReviewViewerProps> = ({
                 </span>
                 {section.title.replace(/^\d+\.\s*/, '')}
               </h4>
-              <div className="text-sm text-slate-300 leading-relaxed whitespace-pre-line font-serif">
-                {section.content}
+              <div className="text-sm text-slate-300 leading-relaxed font-serif">
+                <ReactMarkdown components={markdownComponents}>
+                  {section.content}
+                </ReactMarkdown>
               </div>
             </div>
           ))
         ) : (
-          <div className="prose prose-invert max-w-none text-slate-200 font-serif leading-relaxed text-sm sm:text-base whitespace-pre-line bg-slate-900/50 p-6 rounded-xl border border-slate-700/40">
-            {fullText}
+          <div className="text-slate-200 font-serif leading-relaxed text-sm sm:text-base bg-slate-900/50 p-6 rounded-xl border border-slate-700/40">
+            <ReactMarkdown components={markdownComponents}>
+              {fullText}
+            </ReactMarkdown>
             {isStreaming && (
               <span className="inline-block w-2 h-4 bg-brand-400 ml-1 animate-pulse align-middle"></span>
             )}
