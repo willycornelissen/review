@@ -164,7 +164,7 @@ export const App: React.FC = () => {
       {/* Footer */}
       <footer className="border-t border-slate-900 bg-slate-950 py-6 text-center text-xs text-slate-500">
         <div className="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <span>Book Review Agent • Pronto para GitHub Pages</span>
+          <span>Agente de Resenhas • Pronto para GitHub Pages</span>
           <span>Desenvolvido sob a esteira ECC</span>
         </div>
       </footer>

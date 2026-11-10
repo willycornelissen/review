@@ -16,7 +16,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSettings }) => {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="font-bold text-lg text-white tracking-tight">Book Review Agent</h1>
+              <h1 className="font-bold text-lg text-white tracking-tight">Agente de Resenhas</h1>
               <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-brand-500/20 text-brand-300 border border-brand-500/30">
                 AaaS
               </span>

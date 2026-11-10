@@ -1,6 +1,6 @@
 # Diretrizes de Segurança e Publicação Web (security.md)
 
-Este documento descreve a arquitetura de segurança, o gerenciamento de credenciais da API do Google Gemini e as recomendações para publicação web do **Book Review Agent**.
+Este documento descreve a arquitetura de segurança, o gerenciamento de credenciais da API do Google Gemini e as recomendações para publicação web do **Agente de Resenhas**.
 
 ---
 

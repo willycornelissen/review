@@ -1,4 +1,4 @@
-# Book Review Agent (AaaS Literário)
+# Agente de Resenhas (AaaS Literário)
 
 Aplicação Single Page Application (SPA) para resenhas críticas literárias automatizadas com agentes de inteligência artificial, projetada para rodar de forma 100% estática e sem servidor no **GitHub Pages**.
 
